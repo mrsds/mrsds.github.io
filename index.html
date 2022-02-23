@@ -6,12 +6,66 @@
       Welcome to MRSDS!
     </h1>
     <p>
-      The Methane Research Science Data System (MRSDS) organization
+      The
+      <a href="https://github.com/mrsds">
+	Methane Research Science Data System (MRSDS) organization
+      </a>
       hosts repositories related to data processing, analysis, and
       visualization of atmospheric methane information at the full range
-      of spatial scales including local, regional and global.
+      of spatial scales including local, regional and global.  The collection
+      of software associated with this functionality is referred to as the
+      <b><i>Multi-Scale Methane Analytic Framework (M2AF)</i></b>.  Please
+      refer to
+      <a href="https://agu2021fallmeeting-agu.ipostersessions.com/default.aspx?s=A2-01-44-D1-05-22-EB-A4-8C-6E-F1-CA-20-07-6D-10&guestview=true">
+	Jacob, et al. 2021</a> for additional background information about
+      M2AF software deployed across high performance computing and cloud
+      computing platforms.  The primary visualization component for this work
+      is the Methane Source Finder (MSF) portal, and several of the code
+      repositories relate to the MSF front-end, back-end, and data ingestion
+      components.
     </p>
-
+    The following describes the function of each repository in the MRSDS
+    organization:
+    <ul>
+      <li>
+	<b>mrsds.github.io:</b> This documentation.
+      </li>
+      <li>
+	<b>msf-flow:</b>Local plume processing pipeline, including data
+	harvester, workflow deployment on AWS, wind processor, and plume
+	post-processing and filtering.
+      </li>
+      <li>
+	<b>msf-ui:</b>
+      </li>
+      <li>
+	<b>msf-ui-design:</b>
+      </li>
+      <li>
+	<b>msf-portal-docker:</b>
+      </li>
+      <li>
+	<b>msf-ingestion:</b> Ingest data in to the methane portal.
+      </li>
+      <li>
+	<b>msf-static-layers:</b>
+      </li>
+      <li>
+	<b>msf-be:</b> Backend to methane portal.
+      </li>
+      <li>
+	<b>MethaneSourceFinder-BackEndDocker:</b>
+      </li>
+      <li>
+	<b>MethaneSourceFinder-FrontEndDocker:</b>
+      </li>
+      <li>
+	<b>MethaneSourceFinder-StaticContentDocker:</b>
+      </li>
+      <li>
+	<b>sdap_collections:</b>Example SDAP dataset collection configuration.
+      </li>
+    </ul>
     <h1>
       Science Data Analytics Platform (SDAP)
     </h1>
@@ -125,8 +179,9 @@
 	  <b>collection-manager:</b> 1 pod that keeps track of the datasets
 	  that have been ingested in to an SDAP deployment.  It watches a
 	  folder on AWS S3 or a directory on the local file system for new
-	  files to ingest for each dataset.  When I new file is found it
-	  schedules an ingest job for that file on a queue in RabbitMQ.
+	  files to ingest for each dataset.  When it finds a new file, it
+	  schedules an ingest job for that file on a queue in RabbitMQ that
+	  is being watched by the Granule Ingesters (see below).
 	</li>
 	<li>
 	  <b>rabbitmq:</b> Deployment of RabbitMQ with a queue set up for
