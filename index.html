@@ -1,16 +1,234 @@
 <!DOCTYPE html>
 <html>
-<body>
+  <body>
 
-  <h1>
-    Welcome to MRSDS!
-  </h1>
-  <p>
-    The Methane Research Science Data System organization hosts repositories
-    related to data processing, analysis, and visualization of atmospheric
-    methane information at the full range of spatial scales including local,
-    regional and global. 
-  </p>
+    <h1>
+      Welcome to MRSDS!
+    </h1>
+    <p>
+      The Methane Research Science Data System (MRSDS) organization
+      hosts repositories related to data processing, analysis, and
+      visualization of atmospheric methane information at the full range
+      of spatial scales including local, regional and global.
+    </p>
 
-</body>
+    <h1>
+      Science Data Analytics Platform (SDAP)
+    </h1>
+    <p>
+      We have demonstrated the use of the open-source
+      <a href="https://sdap.apache.org/">
+	Science Data Analytics Platform (SDAP)
+      </a>
+      to perform basic analytics on our gridded methane data products,
+      like our regional and global inversions. SDAP uses Apache Spark
+      for parallel computations in the "map-reduce" style. In
+      map-reduce computations, one or more "map" functions operate
+      independently on different subsets of the data.  Reduction
+      operators combine the distributed map results to produce the
+      final analytics product.  The final product is expected to be
+      smaller than the collection of input data files that were used
+      to compute the result.  In this way, SDAP performs the
+      computations remotely, close to the data, and eliminates the
+      need for large data file downloads.
+    </p>
+    <h2>
+      SDAP Datastore
+    </h2>
+    <p>
+      SDAP delivers rapid subsetting by using a tile-based datastore,
+      instread of operating on many files.  The data array for each
+      variable of interest is partitioned into equal sized tiles, each
+      covering a particular time range and coordinate bounds.  These
+      tiles are ingested into the SDAP datastore, which has two
+      components:
+      <ol>
+	<li>
+	  <b>Solr:</b> Hosts tile attributes, including a unique identifier
+	  for each tile, spatial bounds, time range covered, and summary
+	  statistics; Enables rapid geospatial search for tiles that intersect
+	  a user-defined bounding box.
+	</li>
+	<li>
+	  <b>Cassandra:</b> Hosts the actual data tiles, and enables each
+	  tile to be directly retrieved using its unique identifier,
+	  retrieved from Solr.
+	</li>
+      </ol>
+      The SDAP algorithms rapidly access the necessary data subsets in a
+      two-step process.  First, it performs a geospatial search in Solr to
+      extract the unique identifiers of the data tiles that intersect the
+      time range and spatial area of interest.  It then uses those tile
+      identifiers as keys to directly access the tile data from
+      Cassandra's key-value store.
+    </p>
+    <h2>
+      SDAP Analytics Algorithms
+    </h2>
+    <p>
+      The SDAP analytics algorithms
+      that may highly relevant to multi-scale methane analysis are:
+      <ul>
+	<li>
+	  <b>Area-averaged time series:</b> Compute a spatial mean for each
+	  timestamp.
+	</li>
+	<li>
+	  <b>Time averaged map:</b> Compute a time average for each spatial
+	</li>
+	<li>
+	  <b>Correlation map:</b> Compute the correlation coefficient for two
+	  identically sampled/gridded datasets.
+	</li>
+	<li>
+	  <b>Daily difference average:</b> Compute a spatial mean of the
+	  difference between a dataset and its climatology (long term average)
+	  for each timestamp.
+	</li>
+      </ul>
+      All of the SDAP computations can be constrained to a spatiotemporal
+      bounding box.
+    </p>
+    <h2>
+      SDAP Deployment
+    </h2>
+    <p>
+      SDAP is deployed using Kubernetes and Helm.  A functional SDAP consists
+      of the following components:
+      <ul>
+	<li>
+	  <b>nexus-webapp-driver:</b> 1 pod that listens for incoming web
+	  service calls (SDAP job requests), and routes them to the appropriate
+	  handler.
+	</li>
+	<li>
+	  <b>nexus-analysis-exec:</b> 1 or more Apache Spark executor pods
+	  that perform a share of the work needed to fulfill an SDAP job
+	  request.
+	</li>
+	<li>
+	  <b>sdap-solr:</b> 1 or more replicas of Solr, which is the component
+	  of the SDAP datastore that enables geospatial search for data tiles
+	  that intersect a spatio-temporal bounding box.
+	</li>
+	<li>
+	  <b>sdap-zookeeper:</b>  1 or more replicas of Zookeeper, which is
+	  a sidecar app that handles syncronization and configuration required
+	  for Solr.
+	</li>
+	<li>
+	  <b>sdap-cassandra:</b> 1 or more replicas of Cassandra, which is the
+	  component of the SDAP datastore that enables key lookup and retrieval
+	  of data tile values.
+	</li>
+	<li>
+	  <b>collection-manager:</b> 1 pod that keeps track of the datasets
+	  that have been ingested in to an SDAP deployment.  It watches a
+	  folder on AWS S3 or a directory on the local file system for new
+	  files to ingest for each dataset.  When I new file is found it
+	  schedules an ingest job for that file on a queue in RabbitMQ.
+	</li>
+	<li>
+	  <b>rabbitmq:</b> Deployment of RabbitMQ with a queue set up for
+	  ingest jobs consisting of a file to be ingested.  This queue is
+	  populated by the Collection Manager component, and jobs are popped
+	  off the queue by the Granule Ingester(s).
+	</li>
+	<li>
+	  <b>granule-ingester:</b> 1 or more ingest workers that pop ingest
+	  jobs off of a queue in RabbitMQ, slice the file to be ingested in to
+	  tiles, and ingest the tiles in to the Solr/Cassadra datastore.
+	</li>
+      </ul>
+    <h2>
+      SDAP Data Ingest
+    </h2>
+      <p>
+      To run analytics on a
+      dataset with SDAP you need to first "ingest" the dataset.  Please refer
+      to the <a href="https://github.com/apache/incubator-sdap-nexus/tree/master/helm#readme">
+	SDAP helm deployment instructions</a>
+      to learn how to do deploy and ingest data in to SDAP.  SDAP can support
+      ingest from NetCDF4 or HDF5 files that follow
+      <a href="https://cfconventions.org/">CF Metadata Conventions</a>.
+      </p>
+      <p>
+      As described in the SDAP documentation, you will need to compose a
+      dataset configuration in YAML format in order to configure a dataset
+      for ingest.  Please refer to the examples we provided at
+      <a href="https://github.com/mrsds/sdap_collections/blob/main/collections.yml">Example collections.yaml</a>.
+      </p>
+    <h2>
+      Additional Recommendations to use SDAP
+    </h2>
+      <p>The following are some additional recommendations that we have found
+      increase the likelihood that the SDAP ingesters will support the
+      data files:
+      <ul>
+	<li>
+	  In your NetCDF files, you will provide latitude and longitude
+	  dimensions and also variables that provide values for those
+	  dimensions.  You should ensure that the dimension name matches the
+	  corresponding variable name.  For example, the header should have
+	  something like:
+	  <span style="padding-left: 20px; display:block">
+	    <code>
+	      <pre>
+dimensions:
+    lat = 100 ;
+variables:
+    float lat(lat) ;
+	      </pre>
+	    </code>
+	  </span>
+	  and do <b>not</b> do this:
+	  <span style="padding-left: 20px; display:block">
+	    <code>
+	      <pre>
+dimensions:
+    lat = 100 ;
+variables:
+    float latitude(lat) ;
+	      </pre>
+	    </code>
+	  </span>
+	</li>
+	<li>
+	  In your NetCDF files you will provide a time dimension and variable.
+	  You shoudl ensure your time variable has units of a form accepted
+	  by the CF Conventions.  For example, this is an appropriate time
+	  unit:
+	  <span style="padding-left: 20px; display:block">
+	    <code>
+	      <pre>
+time:units = "seconds since 1970-01-01T00:00:00Z"
+	      </pre>
+	    </code>
+	  </span>
+	</li>
+	<li>
+	  The variable being ingested should be arranged so that the
+	  dimensions are indexed in the following order:
+	  <ol>
+	    <li>time</li>
+	    <li>latitude</li>
+	    <li>longitude</li>
+	  </ol>
+	  For example, the following should work fine with SDAP:
+	  <span style="padding-left: 20px; display:block">
+	    <code>
+	      <pre>
+float fluxes(time, lat, lon) ;
+	      </pre>
+	    </code>
+	  </span>
+	</li>
+	<li>
+	  The variable being ingested can have fill values for grid cells
+	  without valid values. You should identify the fill value using the
+	  standard variable attribute, <code>_FillValue</code>.
+	</li>
+      </ul>
+    </p>
+  </body>
 </html>
