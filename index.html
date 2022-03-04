@@ -36,22 +36,22 @@
 	post-processing and filtering.
       </li>
       <li>
-	<b>msf-ui:</b>
+	<b>msf-ui</b>: This is the front-end map client code based on <a href="https://github.com/nasa/common-mapping-client">Common Mapping Client</a>.
       </li>
       <li>
-	<b>msf-ui-design:</b>
+	<b>msf-ui-design</b>: The Figma files with screen designs. Open them at <a href="http://figma.com">http://figma.com</a>
       </li>
       <li>
-	<b>msf-portal-docker:</b>
+	<b>msf-portal-docker</b>: Used to build Docker containers of the components needed to run the Methane Source Finder web application: msf-ui, msf-be and msf-static-layers.
       </li>
       <li>
-	<b>msf-ingestion:</b> Ingest data in to the methane portal.
+	<b>msf-ingestion:</b> Ingest point-source data into the methane portal database.
       </li>
       <li>
-	<b>msf-static-layers:</b>
+	<b>msf-static-layers</b>: Gridded base layers of data; Dockerized.
       </li>
       <li>
-	<b>msf-be:</b> Backend to methane portal.
+	<b>msf-be:</b> Back-end to methane portal. Includes setting up the point-source data base and providing all the server APIs used by msf-ui to get the data.
       </li>
       <li>
 	<b>MethaneSourceFinder-BackEndDocker:</b>
@@ -69,6 +69,13 @@
 	<b>sdap_notebooks:</b> Example SDAP analytics in a Jupyter notebook.
       </li>
     </ul>
+
+    <p>In order to run the Methane Source Finder (MSF) web application you will need to use msf-ui (the web app), msf-be (the back-end that serves up APIs to provide data to the UI), and msf-static-layers (gridded data layers that are stored as flatfiles), plus a database with the point-source data and GeoTIF plume-images (loaded by msf-ingestion).</p>
+
+    <p>In order to run the point-source data pipeline you will need msf-flow.</p>
+
+    <p>SDAP data ingestion and test Jupyter notebooks are in the sdap_collections and sdap_notebooks repos</p>
+
     <h1>
       Science Data Analytics Platform (SDAP)
     </h1>
