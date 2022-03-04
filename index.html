@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link rel="stylesheet" href="styles/inlineStyles.css">
+  </head>
   <body>
 
     <h1>
@@ -45,7 +48,7 @@
 	<b>msf-portal-docker</b>: Used to build Docker containers of the components needed to run the Methane Source Finder web application: msf-ui, msf-be and msf-static-layers.
       </li>
       <li>
-	<b>msf-ingestion:</b> Ingest point-source data into the methane portal database.
+	<b>msf-ingestion:</b> Ingest point-source data and GeoTIFF plume-images into the methane portal database.
       </li>
       <li>
 	<b>msf-static-layers</b>: Gridded base layers of data; Dockerized.
@@ -70,7 +73,7 @@
       </li>
     </ul>
 
-    <p>In order to run the Methane Source Finder (MSF) web application you will need to use msf-ui (the web app), msf-be (the back-end that serves up APIs to provide data to the UI), and msf-static-layers (gridded data layers that are stored as flatfiles), plus a database with the point-source data and GeoTIF plume-images (loaded by msf-ingestion).</p>
+    <p>In order to run the Methane Source Finder (MSF) web application you will need to use msf-ui (the web app), msf-be (the back-end that serves up APIs to provide data to the UI), and msf-static-layers (gridded data layers that are stored as flatfiles), plus a database with the point-source data and GeoTIFF plume-images (loaded by msf-ingestion).</p>
 
     <p>In order to run the point-source data pipeline you will need msf-flow.</p>
 
@@ -249,25 +252,25 @@
 	  corresponding variable name.  For example, the header should have
 	  something like:
 	  <span style="padding-left: 20px; display:block">
-	    <code>
+
 	      <pre>
 dimensions:
     lat = 100 ;
 variables:
     float lat(lat) ;
 	      </pre>
-	    </code>
+
 	  </span>
 	  and do <b>not</b> do this:
 	  <span style="padding-left: 20px; display:block">
-	    <code>
+
 	      <pre>
 dimensions:
     lat = 100 ;
 variables:
     float latitude(lat) ;
 	      </pre>
-	    </code>
+
 	  </span>
 	</li>
 	<li>
@@ -276,11 +279,11 @@ variables:
 	  by the CF Conventions.  For example, this is an appropriate time
 	  unit:
 	  <span style="padding-left: 20px; display:block">
-	    <code>
+
 	      <pre>
 time:units = "seconds since 1970-01-01T00:00:00Z"
 	      </pre>
-	    </code>
+
 	  </span>
 	</li>
 	<li>
@@ -293,19 +296,20 @@ time:units = "seconds since 1970-01-01T00:00:00Z"
 	  </ol>
 	  For example, the following should work fine with SDAP:
 	  <span style="padding-left: 20px; display:block">
-	    <code>
+
 	      <pre>
 float fluxes(time, lat, lon) ;
 	      </pre>
-	    </code>
+
 	  </span>
 	</li>
 	<li>
 	  The variable being ingested can have fill values for grid cells
 	  without valid values. You should identify the fill value using the
-	  standard variable attribute, <code>_FillValue</code>.
+	  standard variable attribute, <pre>_FillValue</pre>
 	</li>
       </ul>
     </p>
+    <p>the end.</p>
   </body>
 </html>
